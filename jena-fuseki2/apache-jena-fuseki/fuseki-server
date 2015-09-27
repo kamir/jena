@@ -61,7 +61,23 @@ export FUSEKI_BASE="${FUSEKI_BASE:-$PWD/run}"
 
 JVM_ARGS=${JVM_ARGS:--Xmx1200M}
 
-exec java  $JVM_ARGS -jar "$JAR" "$@"
+if [ -z "$JAVA" ]
+then
+    if [ -z "$JAVA_HOME" ]
+    then
+       JAVA=$(which java)
+    else
+       JAVA=$JAVA_HOME/bin/java
+    fi
+fi
+
+if [ -z "$JAVA" ]
+then
+  echo "Cannot find a Java JDK. Please either set JAVA, JAVA_HOME or put java (>=1.8) in your PATH." 2>&2
+  exit 1
+fi
+
+exec $JAVA $JVM_ARGS -jar "$JAR" "$@"
 
 ## Adding custom code to the Fuseki server:
 ##
